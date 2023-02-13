@@ -4,43 +4,23 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import java.util.Arrays;
+
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.IndividualLed;
+import frc.robot.utils.LedsGeometry;
 
 public class LedsManager extends SubsystemBase {
     private static LedsManager instance;
 
-    private final AddressableLED kaleidoscopeSystem;
-    private AddressableLEDBuffer ledMask;
-    private boolean hasLMChanged;
+    private final LedsGeometry ledsGeometry;
+    private Color[] leds;
     
     private LedsManager() {
-        kaleidoscopeSystem = new AddressableLED(Constants.LED_PORT);
-        kaleidoscopeSystem.setLength(Constants.LED_NUM);
-
-        hasLMChanged = false;
-        setDefaultBuffer();
-    }
-
-    private void setDefaultBuffer() {
-        ledMask = new AddressableLEDBuffer(Constants.LED_NUM);
-        for (int i = 0; i < Constants.LED_NUM - 1; i++) {
-            ledMask.setLED(i, Color.kBlue);
-        }
-        ledMask.setLED(Constants.LED_NUM - 1, Color.kBlack);
-        hasLMChanged = true;
-    }
-
-    private static AddressableLEDBuffer copy(AddressableLEDBuffer buffer) {
-        var newBuffer = new AddressableLEDBuffer(buffer.getLength());
-        for (int i = 0; i < buffer.getLength(); i++) {
-            newBuffer.setLED(i, buffer.getLED8Bit(i));
-        }
-        return newBuffer;
+        ledsGeometry = new LedsGeometry(Constants.LED_STRIPS);
+        leds = new Color[ledsGeometry.totalLength];
     }
 
     public static LedsManager getInstance() {
@@ -50,25 +30,17 @@ public class LedsManager extends SubsystemBase {
         return instance;
     }
 
-    public AddressableLEDBuffer update(IndividualLed... individualLeds) {
-        for (var led : individualLeds) {
-            if (!hasLMChanged && !led.color.equals(ledMask.getLED(led.index)))
-                hasLMChanged = true;
-            
-            ledMask.setLED(led.index, led.color);
-        }
-        return copy(ledMask);
+    public Color[] update(IndividualLed... individualLeds) {
+        Arrays.stream(individualLeds).forEach((led) -> leds[led.index] = led.color);
+        return leds;
     }
 
     private void setChanges() {
-        // TODO: set changes in Leds
+        ledsGeometry.setColor(leds);
     }
 
     @Override
     public void periodic() {
-        if (hasLMChanged)
-            setChanges();
-
-        hasLMChanged = false;
+        setChanges();
     }
 }
