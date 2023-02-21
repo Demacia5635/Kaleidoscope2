@@ -16,17 +16,19 @@ public class LedsGeometry {
     private boolean[] hasLMsChanged;
 
     /**
-     * Creates a new LedsGeometry 
+     * Creates a new LedsGeometry
      * 
      * @param ledStrips Pairs of ports and lengths of srtrips
      */
     public LedsGeometry(IntPair... ledStrips) {
-        addressableLEDs = Arrays.stream(ledStrips).map((strip) -> new AddressableLED(strip.first)).toArray(AddressableLED[]::new);
+        addressableLEDs = Arrays.stream(ledStrips).map((strip) -> new AddressableLED(strip.first))
+                .toArray(AddressableLED[]::new);
         lengths = Arrays.stream(ledStrips).mapToInt((strip) -> strip.second).toArray();
         for (int i = 0; i < addressableLEDs.length; i++) {
             addressableLEDs[i].setLength(lengths[i]);
+            addressableLEDs[i].start();
         }
-        
+
         totalLength = Arrays.stream(lengths).sum();
         deFlattenedCoords = new IntPair[totalLength];
 
@@ -38,10 +40,22 @@ public class LedsGeometry {
             k += lengths[i];
         }
 
-        buffers = Arrays.stream(lengths).mapToObj((length) -> new AddressableLEDBuffer(length)).toArray(AddressableLEDBuffer[]::new);
+        buffers = Arrays.stream(lengths).mapToObj((length) -> new AddressableLEDBuffer(length))
+                .toArray(AddressableLEDBuffer[]::new);
     }
-    
+
     public void setColor(Color[] colors) {
-        // TODO: add functionality and compare to older buffer
+        for (int i = 0; i < totalLength; i++) {
+            IntPair indexes = deFlattenedCoords[i];
+            hasLMsChanged[indexes.first] = hasLMsChanged[indexes.first]
+                    || !buffers[indexes.first].getLED(indexes.second).equals(colors[i]);
+            buffers[indexes.first].setLED(indexes.second, colors[i]);
+        }
+
+        for (int i = 0; i < lengths.length; i++) {
+            if (hasLMsChanged[i])
+                addressableLEDs[i].setData(buffers[i]);
+            hasLMsChanged[i] = false;
+        }
     }
 }

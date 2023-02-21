@@ -12,15 +12,20 @@ import frc.robot.Constants;
 import frc.robot.utils.IndividualLed;
 import frc.robot.utils.LedsGeometry;
 
-public class LedsManager extends SubsystemBase {
+public final class LedsManager extends SubsystemBase {
     private static LedsManager instance;
 
     private final LedsGeometry ledsGeometry;
     private Color[] leds;
-    
+
     private LedsManager() {
         ledsGeometry = new LedsGeometry(Constants.LED_STRIPS);
         leds = new Color[ledsGeometry.totalLength];
+        setDefaultColor();
+    }
+
+    private void setDefaultColor() {
+        Arrays.fill(leds, new Color(168, 0, 230));
     }
 
     public static LedsManager getInstance() {
@@ -32,7 +37,7 @@ public class LedsManager extends SubsystemBase {
 
     public Color[] update(IndividualLed... individualLeds) {
         Arrays.stream(individualLeds).forEach((led) -> leds[led.index] = led.color);
-        return leds;
+        return leds.clone();
     }
 
     private void setChanges() {
