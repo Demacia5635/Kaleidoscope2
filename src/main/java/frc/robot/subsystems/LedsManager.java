@@ -16,19 +16,23 @@ import frc.robot.utils.IndividualLed;
 import frc.robot.utils.LedsGeometry;
 
 public final class LedsManager extends SubsystemBase {
-    private static LedsManager instance;
 
+    private final List<IndividualLed> off;
+    
+    private static LedsManager instance;
+    
     private final LedsGeometry ledsGeometry;
     private List<IndividualLed> leds;
 
     private LedsManager() {
         ledsGeometry = new LedsGeometry(Constants.LED_STRIPS);
+        off = IntStream.range(0, ledsGeometry.totalLength).mapToObj((i) -> new IndividualLed(i, Color.kBlack)).toList();
         leds = new ArrayList<>();
         setDefaultColor();
     }
 
     private void setDefaultColor() {
-        leds.addAll(leds);
+        leds = off;
     }
 
     public static LedsManager getInstance() {
