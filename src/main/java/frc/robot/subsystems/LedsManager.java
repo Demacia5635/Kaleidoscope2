@@ -4,7 +4,9 @@
 
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import edu.wpi.first.wpilibj.util.Color;
@@ -17,16 +19,16 @@ public final class LedsManager extends SubsystemBase {
     private static LedsManager instance;
 
     private final LedsGeometry ledsGeometry;
-    private Color[] leds;
+    private List<IndividualLed> leds;
 
     private LedsManager() {
         ledsGeometry = new LedsGeometry(Constants.LED_STRIPS);
-        leds = new Color[ledsGeometry.totalLength];
+        leds = new ArrayList<>();
         setDefaultColor();
     }
 
     private void setDefaultColor() {
-        Arrays.fill(leds, Color.kBlack);
+        leds.addAll(leds);
     }
 
     public static LedsManager getInstance() {
@@ -37,15 +39,16 @@ public final class LedsManager extends SubsystemBase {
     }
 
     public void update(IndividualLed... individualLeds) {
-        Arrays.stream(individualLeds).forEach((led) -> leds[led.index] = led.color);
+        leds.addAll(Arrays.asList(individualLeds));
     }
 
     private void setChanges() {
         ledsGeometry.setColor(leds);
+        leds = new ArrayList<>();
     }
 
     public Color[] getColors(int startIndex, int size) {
-        return IntStream.range(startIndex, size + startIndex).mapToObj((i) -> leds[i]).toArray(Color[]::new);
+        return IntStream.range(startIndex, size + startIndex).mapToObj(ledsGeometry::getColor).toArray(Color[]::new);
     }
 
     @Override

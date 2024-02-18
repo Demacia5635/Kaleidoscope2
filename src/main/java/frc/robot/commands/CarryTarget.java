@@ -1,9 +1,9 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.led_patches.SubStrip;
 
-public class CarryTarget extends CommandBase {
+public class CarryTarget extends Command {
     private final SubStrip strip;
 
     public CarryTarget(SubStrip strip) {

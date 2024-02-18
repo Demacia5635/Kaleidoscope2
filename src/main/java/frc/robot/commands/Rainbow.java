@@ -5,10 +5,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.led_patches.SubStrip;
 
-public class Rainbow extends CommandBase {
+public class Rainbow extends Command {
     private final SubStrip strip;
     private final double speed;
     private double currentH;
