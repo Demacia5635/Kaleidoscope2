@@ -20,7 +20,7 @@ public final class LedsManager extends SubsystemBase {
     private final List<IndividualLed> off;
     
     private static LedsManager instance;
-    
+
     private final LedsGeometry ledsGeometry;
     private List<IndividualLed> leds;
 
@@ -52,7 +52,12 @@ public final class LedsManager extends SubsystemBase {
     }
 
     public Color[] getColors(int startIndex, int size) {
-        return IntStream.range(startIndex, size + startIndex).mapToObj(ledsGeometry::getColor).toArray(Color[]::new);
+        Color[] colors = new Color[size];
+        int end = startIndex + size;
+        for (int i = startIndex; i < end; i++) {
+            colors[i] = ledsGeometry.getColor(i);
+        }
+        return colors;
     }
 
     @Override
